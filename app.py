@@ -107,6 +107,7 @@ def plot():
     img_base64 = generate_base64_image()
 
     return render_template('dashboard.html', div_fig1=div_fig1, div_fig2=div_fig2, div_fig3=div_fig3, img_base64=img_base64)
-
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
