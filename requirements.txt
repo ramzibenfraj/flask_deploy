@@ -25,7 +25,7 @@ plotly-express==0.4.1
 pyparsing==3.1.1
 python-dateutil==2.8.2
 pytz==2023.3.post1
-scikit-learn==1.0.2
+scikit-learn
 scipy==1.11.4
 seaborn==0.13.0
 six==1.16.0
