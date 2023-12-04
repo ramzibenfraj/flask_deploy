@@ -1,5 +1,6 @@
 gunicorn
 flash
+joblib
 Flask
 Jinja2
 joblib
