@@ -5,7 +5,6 @@ Jinja2
 joblib
 matplotlib
 numpy
-packaging
 pandas
 plotly
 plotly-express
