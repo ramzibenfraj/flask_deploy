@@ -19,13 +19,13 @@ with open('model_random_forest.pkl', 'rb') as file:
 cars_data = pd.read_csv('cleaned_cars_data.csv')
 selected_features = ['year', 'hp', 'cylinders', 'doors', 'highway_mpg', 'city_mpg', 'popularity', 'price']
 subset_data = cars_data[selected_features]
-data_make = pd.read_csv('df_cat_make_value.csv')
+
 
 @app.route('/')
 def home():
-    # Get unique 'make' values from the cars_data DataFrame
-    unique_makes = cars_data['make'].unique()
-    return render_template('index.html', unique_makes=unique_makes)
+    return render_template('index.html')
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if request.method == 'POST':
@@ -35,38 +35,27 @@ def predict():
             cylinders = int(request.form['cylinders'])
             year = int(request.form['year'])
             doors = float(request.form['doors'])
-            make = request.form['make']
-            transmission = request.form['transmission']
 
-            # Prepare categorical data (perform one-hot encoding)
-            make_columns = [col for col in data_make.columns if col.startswith('make_')]  # Get all 'make' columns
-            transmission_colum = ['transmission_AUTOMATED_MANUAL','transmission_AUTOMATIC','transmission_MANUAL']
-
-            categorical_data_transmission = pd.DataFrame(0, index=np.arange(1), columns=transmission_colum)
-            categorical_data_transmission['transmission_' + transmission] = 1
-            # Create a new DataFrame with all 'make' columns and set the selected make to 1 and others to 0
-            categorical_data_encoded = pd.DataFrame(0, index=np.arange(1), columns=make_columns)
-            categorical_data_encoded['make_' + make] = 1
-            print(make_columns)
-            # Combine numerical and encoded categorical features
-            input_features = pd.concat([
-                pd.DataFrame({'hp': [hp], 'cylinders': [cylinders], 'year': [year], 'doors': [doors]}),
-                categorical_data_encoded,categorical_data_transmission], axis=1)
-            print(input_features)
+            # Create a NumPy array from the user input for prediction
+            input_features = np.array([[hp, cylinders, year, doors]])
 
             # Make a prediction using the loaded model
             prediction = model.predict(input_features)
 
             # Render HTML template with prediction and input features
             return render_template('prediction_result.html', hp=hp, cylinders=cylinders,
-                                   year=year, doors=doors,make=make,transmission=transmission, prediction=round(prediction[0], 2))
+                                   year=year, doors=doors, prediction=round(prediction[0], 2))
 
         except Exception as e:
             # Handle exceptions or errors here
             print(str(e))
             return jsonify({'error': 'An error occurred during prediction.'})
+
+
 @app.route('/plot')
 def plot():
+    # Assuming cars_data and subset_data are defined somewhere
+
     def generate_plot_div():
         # Generate Plotly figures
         fig1 = px.scatter(cars_data, x='doors', y='price', color='doors')
@@ -107,7 +96,7 @@ def plot():
     img_base64 = generate_base64_image()
 
     return render_template('dashboard.html', div_fig1=div_fig1, div_fig2=div_fig2, div_fig3=div_fig3, img_base64=img_base64)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-
